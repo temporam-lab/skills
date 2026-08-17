@@ -5,7 +5,7 @@ description: Use Temporam temporary email — create mailboxes, wait for inbound
 
 # Temporam
 
-Temporary email API. Auth: `Authorization: Bearer <API_KEY>`. Default base URL: `https://api.temporam.cn`.
+Temporary email API. Auth: `Authorization: Bearer <API_KEY>`. Default base URL: `https://api.temporam.com`.
 
 Follow the public OpenAPI spec. Do not invent endpoints that are not listed there.
 
