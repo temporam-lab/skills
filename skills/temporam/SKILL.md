@@ -5,9 +5,26 @@ description: Use Temporam temporary email — create mailboxes, wait for inbound
 
 # Temporam
 
-Temporary email API. Auth: `Authorization: Bearer <API_KEY>`. Default base URL: `https://api.temporam.com`.
+Temporary email **v3** API. Auth: `Authorization: Bearer <API_KEY>`. Base URL: `https://api.temporam.com`. Paths are under `/v3` only. Do not call `/v1`.
 
-Follow the public OpenAPI spec. Do not invent endpoints that are not listed there.
+Do not invent endpoints. Prefer MCP tools when `@temporam/mcp` is configured.
+
+## MCP
+
+```json
+{
+  "mcpServers": {
+    "temporam": {
+      "command": "npx",
+      "args": ["-y", "@temporam/mcp"],
+      "env": {
+        "TEMPORAM_API_KEY": "<API_KEY>",
+        "TEMPORAM_API_BASE": "https://api.temporam.com"
+      }
+    }
+  }
+}
+```
 
 ## Naming
 
@@ -39,7 +56,3 @@ Get an API key from the Temporam console. Put it in MCP env `TEMPORAM_API_KEY` o
 ## Sending (optional)
 
 `from` must be one of your active mailboxes. Provide `text` and/or `html`. No attachments or CC. `GET /v3/messages/{id}` does not return the body.
-
-## MCP
-
-If `@temporam/mcp` is installed, prefer its tools (`create_mailbox`, `get_latest_email`, etc.) over raw curl unless the user asks for HTTP.
