@@ -1,6 +1,6 @@
 ---
 name: temporam
-description: Use Temporam temporary email — create mailboxes, wait for inbound messages (OTP/verification), and send mail via API or MCP.
+description: Use Temporam temporary email — generate inbound addresses, wait for messages (OTP/verification), and optionally create sender mailboxes to send mail via API or MCP.
 ---
 
 # Temporam
@@ -30,7 +30,8 @@ Do not invent endpoints. Prefer MCP tools when `@temporam/mcp` is configured.
 
 | Resource | Meaning |
 |----------|---------|
-| `mailboxes` | Mailbox addresses |
+| inbound address | An unregistered address generated client-side from a system domain |
+| `mailboxes` | Registered outbound sender addresses used by `messages` |
 | `emails` | Inbound mail (inbox) |
 | `messages` | Outbound send |
 
@@ -41,10 +42,12 @@ Get an API key from the Temporam console. Put it in MCP env `TEMPORAM_API_KEY` o
 ## Workflow (wait for a verification code)
 
 1. `GET /v3/domains` — pick an available domain.
-2. `POST /v3/mailboxes` — create an address (`local_part` optional).
-3. Give that address to the third party.
-4. Poll `GET /v3/emails/latest?email=` or list then `GET /v3/emails/{id}`.
+2. Generate a high-entropy local part client-side (for example, a UUID) and append `@<domain>`. The address does not need to be created or registered.
+3. Give the generated address to the third party.
+4. Poll `GET /v3/emails/latest?email=` or list with `GET /v3/emails?email=`, then read a result with `GET /v3/emails/{id}`.
 5. Read the code from `content`. List items only include `summary`; full body is on detail/latest.
+
+Do **not** call `POST /v3/mailboxes` for inbound mail. Mailbox CRUD only manages outbound sender addresses.
 
 ## Quotas
 
@@ -55,4 +58,4 @@ Get an API key from the Temporam console. Put it in MCP env `TEMPORAM_API_KEY` o
 
 ## Sending (optional)
 
-`from` must be one of your active mailboxes. Provide `text` and/or `html`. No attachments or CC. `GET /v3/messages/{id}` does not return the body.
+Create a sender with `POST /v3/mailboxes` if needed. `from` must be one of your active sender mailboxes. Provide `text` and/or `html`. No attachments or CC. `GET /v3/messages/{id}` does not return the body.
