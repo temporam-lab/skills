@@ -51,6 +51,8 @@ Do **not** call `POST /v3/mailboxes` for inbound mail. Mailbox CRUD only manages
 
 ## Quotas
 
+Call `GET /v3/me` (MCP `get_me`) for name, plan, remaining inbound/outbound, mailbox slots, and period end. It does not consume quota.
+
 - Claiming one unclaimed inbound message = 1 **inbound** point. `list_emails` may claim multiple messages up to its limit; latest/detail may claim one. Already-owned messages do not charge again.
 - With inbound remaining at 0 you can still list your own history; you do not get `429` only because unclaimed mail still exists.
 - A successful send = 1 **outbound** point. Hobby plans have `outbound=0` and receive `429` `quota_exceeded`.
