@@ -1,6 +1,6 @@
 ---
 name: temporam
-description: Use Temporam temporary email — generate inbound addresses, wait for messages (OTP/verification), and optionally create sender mailboxes to send mail via API or MCP.
+description: Use Temporam temporary email — generate and favorite inbound addresses, wait for messages (OTP/verification), and optionally create sender mailboxes to send mail via API or MCP.
 ---
 
 # Temporam
@@ -32,6 +32,7 @@ Do not invent endpoints. Prefer MCP tools when `@temporam/mcp` is configured.
 |----------|---------|
 | inbound address | An unregistered address generated client-side from a system domain |
 | `mailboxes` | Registered outbound sender addresses used by `messages` |
+| `favorites` | Saved inbound addresses for reuse; not sender mailboxes |
 | `emails` | Inbound mail (inbox) |
 | `messages` | Outbound send |
 
@@ -49,6 +50,14 @@ Get an API key from the Temporam console. Put it in MCP env `TEMPORAM_API_KEY` o
 
 Do **not** call `POST /v3/mailboxes` for inbound mail. Mailbox CRUD only manages outbound sender addresses.
 
+## Reusing inbound addresses
+
+Save an inbound address with MCP `create_favorite` or `POST /v3/favorites`. Favorite CRUD does not consume monthly quota and does not create or delete inbound messages.
+
+- Use `list_favorites` to retrieve saved addresses, then pass a favorite's `address` to `list_emails` or `get_latest_email`.
+- Use `update_favorite` to replace a saved address and `delete_favorite` to remove it.
+- A favorite is not a sender mailbox. To send from that address, pass its `domain` and `local_part` to `create_mailbox`; normal domain availability and mailbox limits still apply.
+
 ## Quotas
 
 Call `GET /v3/me` (MCP `get_me`) for name, plan, remaining inbound/outbound, mailbox slots, and period end. It does not consume quota.
@@ -56,6 +65,7 @@ Call `GET /v3/me` (MCP `get_me`) for name, plan, remaining inbound/outbound, mai
 - Claiming one unclaimed inbound message = 1 **inbound** point. `list_emails` may claim multiple messages up to its limit; latest/detail may claim one. Already-owned messages do not charge again.
 - With inbound remaining at 0 you can still list your own history; you do not get `429` only because unclaimed mail still exists.
 - A successful send = 1 **outbound** point. Hobby plans have `outbound=0` and receive `429` `quota_exceeded`.
+- Favorite create/list/get/update/delete operations do not consume inbound or outbound quota.
 - `POST /v3/messages` is **not idempotent** — do not retry blindly.
 
 ## Sending (optional)
