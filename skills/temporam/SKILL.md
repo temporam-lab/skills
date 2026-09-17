@@ -30,7 +30,7 @@ Do not invent endpoints. Prefer MCP tools when `@temporam/mcp` is configured.
 
 | Resource | Meaning |
 |----------|---------|
-| inbound address | An unregistered address generated client-side from a system domain |
+| inbound address | An unregistered address generated client-side from a domain in `GET /v3/domains` (system plus the caller's private domains) |
 | `mailboxes` | Registered outbound sender addresses used by `messages` |
 | `favorites` | Saved inbound addresses for reuse; not sender mailboxes |
 | `emails` | Inbound mail (inbox) |
@@ -42,7 +42,7 @@ Get an API key from the Temporam console. Put it in MCP env `TEMPORAM_API_KEY` o
 
 ## Workflow (wait for a verification code)
 
-1. `GET /v3/domains` — pick an available domain.
+1. `GET /v3/domains` — pick an available domain (`scope=system` public pool, or `scope=user` for a domain this account already owns).
 2. Generate a high-entropy local part client-side (for example, a UUID) and append `@<domain>`. The address does not need to be created or registered.
 3. Give the generated address to the third party.
 4. Poll `GET /v3/emails/latest?email=` or list with `GET /v3/emails?email=`, then read a result with `GET /v3/emails/{id}`.
@@ -71,3 +71,7 @@ Call `GET /v3/me` (MCP `get_me`) for name, plan, remaining inbound/outbound, mai
 ## Sending (optional)
 
 Create a sender with `POST /v3/mailboxes` if needed. `from` must be one of your active sender mailboxes. Provide `text` and/or `html`. No attachments or CC. `GET /v3/messages/{id}` does not return the body.
+
+## Contract
+
+Machine-readable spec: import `openapi/openapi.yaml` from the Public API repo (v0.7.0+). Do not copy a second field table into this skill.
